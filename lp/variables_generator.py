@@ -2,7 +2,11 @@ from lp.utils import to_index
 
 
 def __is_fully_covered(g, v1, v2):
+    if g.degree(v1) == 0:
+        return False
     for n_v2 in g[v2].keys():
+        if g.degree(v2) == 0:
+            continue
         if g[v1].get(n_v2) is None:
             return False
     return True

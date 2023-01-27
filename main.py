@@ -38,8 +38,8 @@ def run(no_nodes, no_edges):
     l_len = s_len + b_len
     integer_solution = __solve(g, b_len, s_len, False)
     db_service.persist_meta_data(
-        bgraph_db_id, integer_solution["number_of_covered_neighborhood"], integer_solution["variables_no"],
-        integer_solution["constraints_no"]
+        bgraph_db_id, integer_solution["number_of_covered_neighborhood"], integer_solution["number_of_twins"],
+        integer_solution["variables_no"], integer_solution["constraints_no"]
     )
     db_service.persist_solution(
         bgraph_db_id, l_len, integer_solution['k'], integer_solution['values'],

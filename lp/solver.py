@@ -8,6 +8,7 @@ from lp.variables_generator import create_variables
 from lp.flipper_constraints import add_flipper_constraints
 from lp.triangle_constraints import add_triangle_constraints
 from lp.cumulative_constraints import add_cumulative_constraints
+import numpy as np
 
 
 def __create_nodes_sequence(values, l_len):
@@ -19,7 +20,7 @@ def __create_nodes_sequence(values, l_len):
     return list(dict(sorted(sequence.items(), key=lambda x: x[1], reverse=True)).keys())
 
 
-def solve(g, b_len, s_len, with_fractional_results,no_threads):
+def solve(g, b_len, s_len, with_fractional_results, no_threads):
     b = list(range(b_len))
     s = list(range(b_len, b_len + s_len))
     l = b + s
@@ -34,7 +35,7 @@ def solve(g, b_len, s_len, with_fractional_results,no_threads):
     variables, number_of_covered_neighborhood = create_variables(solver, g, b, s, l, with_fractional_results)
     add_flipper_constraints(solver, variables, l)
     add_triangle_constraints(solver, variables, l)
-    set_twin_nodes_constraints(solver, variables, g, b, s, l)
+    twins_counter = set_twin_nodes_constraints(solver, variables, g, b, s, l)
     add_cumulative_constraints(solver, variables, b, s, l)
     # add_degree_one_constraints(solver, variables, adj_list, b, s, l)
 
@@ -46,6 +47,7 @@ def solve(g, b_len, s_len, with_fractional_results,no_threads):
     result = {}
     if status == pywraplp.Solver.OPTIMAL:
         k = variables[solver.NumVariables() - 1].solution_value()
+        k = np.round(k, 4)
         for var_index in range(solver.NumVariables() - 1):
             result[var_index] = variables[var_index].solution_value()
         solver.Clear()
@@ -54,11 +56,13 @@ def solve(g, b_len, s_len, with_fractional_results,no_threads):
             sequence = __create_nodes_sequence(result, len(l))
         return {
             "k": k, "values": result, "number_of_covered_neighborhood": number_of_covered_neighborhood,
-            "variables_no": variables_no, "constraints_no": constraints_no, "sequence": sequence
+            "number_of_twins": twins_counter, "variables_no": variables_no, "constraints_no": constraints_no,
+            "sequence": sequence
         }
     else:
         print('The problem does not have an optimal solution.')
         return {
             "k": -1, "values": [], "number_of_covered_neighborhood": number_of_covered_neighborhood,
-            "variables_no": variables_no, "constraints_no": constraints_no, "sequence": None,
+            "number_of_twins": twins_counter, "variables_no": variables_no, "constraints_no": constraints_no,
+            "sequence": None,
         }

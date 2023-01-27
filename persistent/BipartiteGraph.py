@@ -16,6 +16,7 @@ class BipartiteGraph(BaseModel):
     s_graph = pw.ForeignKeyField(SampleGraph, backref='s_graph')
     number_of_edges = pw.IntegerField()
     number_of_covered_neighborhood = pw.IntegerField(null=True)
+    number_of_twins = pw.IntegerField(null=True)
     integer_solution_time = pw.DoubleField(null=True)
     fractional_solution_time = pw.DoubleField(null=True)
     lp_variables_no = pw.IntegerField(null=True)
