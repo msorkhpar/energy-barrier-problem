@@ -7,7 +7,7 @@ load_dotenv()
 
 db = None
 if db is None:
-    db = pw.SqliteDatabase(f"db/{os.environ.get('DB_NAME')}")
+    db = pw.SqliteDatabase(f"./db/{os.environ.get('DB_NAME')}")
 
 
 class BaseModel(pw.Model):

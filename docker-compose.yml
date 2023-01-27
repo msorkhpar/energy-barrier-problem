@@ -17,7 +17,7 @@ services:
       - MAX_NUMBER_OF_EDGES=${MAX_NUMBER_OF_EDGES}
       - DB_NAME=${DB_NAME}
     volumes:
-      - ./db:/home/solver/db
+      - ./db:/app/db
     deploy:
       resources:
         limits:
@@ -26,5 +26,3 @@ services:
         reservations:
           cpus: "2"
           memory: 2GB
-volumes:
-  app:

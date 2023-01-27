@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 import os
 import time
-import sys
-
-import dotenv
 
 from graph_generator.bgraph_corrector import omit_degree_ones_from_bgraph
 from graph_generator.bipartite_generator import create_bgraph_of_intersections
@@ -11,12 +8,12 @@ from graph_generator.bipartite_transformer import transform_bgraph
 from graph_generator.sample_graph_generator import generate_graph
 from lp.solver import solve
 from persistent import db_service
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 
 
 def __solve(g, b_len, s_len, fractional):
     start = time.time()
-    result = solve(g, b_len, s_len, fractional,os.environ.get('NUMBER_OF_THREADS'))
+    result = solve(g, b_len, s_len, fractional, int(os.environ.get('NUMBER_OF_THREADS')))
     running_time = time.time() - start
     print("*" * 120)
     print(f"[ K is: '{result['k']}', with_fraction:'{fractional}' , running time in sec: '{running_time:.2f}' ]")

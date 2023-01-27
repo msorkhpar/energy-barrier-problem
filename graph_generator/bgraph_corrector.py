@@ -1,6 +1,3 @@
-import networkx as nx
-
-
 def get_tuple(node_name):
     return tuple(map(int, node_name[2:-1].split(',')))
 

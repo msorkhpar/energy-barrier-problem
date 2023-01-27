@@ -1,4 +1,4 @@
-from lp.utils import to_index, from_index
+from lp.utils import to_index
 
 
 def __is_fully_covered(g, v1, v2):
@@ -47,8 +47,6 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
                 number_of_covered_neighborhood += 1
                 vars_dict.update({to_index(l_len, v1, v2): (0, 0)})
                 vars_dict.update({to_index(l_len, v2, v1): (1, 1)})
-
-
 
     for index, r in vars_dict.items():
         if with_fractional_results:
