@@ -1,0 +1,7 @@
+networkx
+numpy
+pandas
+matplotlib
+ortools
+peewee
+python-dotenv

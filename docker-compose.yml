@@ -1,0 +1,30 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: energy-barrier-solver:1.0
+    container_name: energy-barrier-solver
+    command: python3 main.py
+    environment:
+      - TZ=America/Indiana/Indianapolis
+      - PYTHONUNBUFFERED=1
+      - NUMBER_OF_THREADS=${NUMBER_OF_THREADS}
+      - NUMBER_OF_VERTICES=${NUMBER_OF_VERTICES}
+      - NUMBER_OF_SAMPLES=${NUMBER_OF_SAMPLES}
+      - MIN_NUMBER_OF_EDGES=${MIN_NUMBER_OF_EDGES}
+      - MAX_NUMBER_OF_EDGES=${MAX_NUMBER_OF_EDGES}
+      - DB_NAME=${DB_NAME}
+    volumes:
+      - ./db:/home/solver/db
+    deploy:
+      resources:
+        limits:
+          cpus: "12"
+          memory: 50GB
+        reservations:
+          cpus: "2"
+          memory: 2GB
+volumes:
+  app:
