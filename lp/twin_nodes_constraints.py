@@ -2,7 +2,6 @@ from lp.utils import to_index
 
 
 def __add_twins(side, solver, variables, g, l):
-    l_len = len(l)
     processed = set()
     twins_counter = 0
     for va in side:
@@ -13,12 +12,12 @@ def __add_twins(side, solver, variables, g, l):
                 for vc in l:
                     if g[vc] == g[va] or vc == va or vc == vb:
                         continue
-                    x_ac = to_index(l_len, va, vc)
-                    x_bc = to_index(l_len, vb, vc)
+                    x_ac = to_index(va, vc)
+                    x_bc = to_index(vb, vc)
                     solver.Add(variables[x_ac] == variables[x_bc])
                 twins_counter += 1
         processed.add(va)
-        return twins_counter
+    return twins_counter
 
 
 def set_twin_nodes_constraints(solver, variables, g, b, s, l):

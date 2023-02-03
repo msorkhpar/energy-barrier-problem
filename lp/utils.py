@@ -1,11 +1,16 @@
 from datetime import datetime
 
 
-def to_index(l_len, i, j):
+def set_l_len(__l_len):
+    global l_len
+    l_len = __l_len
+
+
+def to_index(i, j):
     return i * l_len + j
 
 
-def from_index(l_len, index):
+def from_index(index):
     index = int(index)
     if index == l_len ** 2:
         return "K", ""

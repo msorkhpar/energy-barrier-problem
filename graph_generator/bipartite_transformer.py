@@ -1,5 +1,7 @@
 import networkx as nx
 
+from lp.utils import set_l_len
+
 
 def transform_bgraph(g):
     left_nodes = [n for n in g.nodes if g.nodes[n]['bipartite'] == 0]
@@ -24,5 +26,6 @@ def transform_bgraph(g):
 
     g = nx.relabel_nodes(g, edge_mapper)
     edge_mapper = dict(sorted(edge_mapper.items(), key=lambda x: x[1]))
+    set_l_len(s_len + b_len)
 
     return g, b_len, s_len, edge_mapper

@@ -1,4 +1,9 @@
 def get_tuple(node_name):
+    node_type = type(node_name)
+    if node_type is int or node_type is float:
+        return node_name
+    if node_type is str and "," not in node_name:
+        return node_name
     return tuple(map(int, node_name[2:-1].split(',')))
 
 

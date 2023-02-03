@@ -32,7 +32,7 @@ def __persist_bgraph(b_db_id, s_db_id, b_len, s_len, number_of_edges, edges, nod
         return g.bgraph_id
 
 
-def __update_lp_values(b_db_id, number_of_covered_neighborhood,number_of_twins, lp_variables_no, lp_constraints_no):
+def __update_lp_values(b_db_id, number_of_covered_neighborhood, number_of_twins, lp_variables_no, lp_constraints_no):
     with BaseModel.get_db() as db:
         bgraph = BipartiteGraph.get(BipartiteGraph.bgraph_id == b_db_id)
         bgraph.number_of_covered_neighborhood = number_of_covered_neighborhood
@@ -108,8 +108,8 @@ def persist_bgraph(b_db_id, s_db_id, b_len, s_len, edge_mapper, g):
     return __persist_bgraph(b_db_id, s_db_id, b_len, s_len, len(g.edges), edges_list, node_mapping)
 
 
-def persist_solution(bgraph_db_id, l_len, k, values, fractional, solution_time, sequence=None):
-    vals = [utils.result(l_len, from_node, to_node) for from_node, to_node in values.items()]
+def persist_solution(bgraph_db_id, k, values, fractional, solution_time, sequence=None):
+    vals = [utils.result(from_node, to_node) for from_node, to_node in values.items()]
     if fractional:
         __update_fractional_solution(bgraph_db_id, k, solution_time)
         return __persist_fractional_result(bgraph_db_id, k, vals)
@@ -118,5 +118,5 @@ def persist_solution(bgraph_db_id, l_len, k, values, fractional, solution_time, 
         return __persist_integer_result(bgraph_db_id, k, vals, sequence)
 
 
-def persist_meta_data(b_db_id, number_of_covered_neighborhood,number_of_twins, lp_variables_no, lp_constraints_no):
-    __update_lp_values(b_db_id, number_of_covered_neighborhood,number_of_twins, lp_variables_no, lp_constraints_no)
+def persist_meta_data(b_db_id, number_of_covered_neighborhood, number_of_twins, lp_variables_no, lp_constraints_no):
+    __update_lp_values(b_db_id, number_of_covered_neighborhood, number_of_twins, lp_variables_no, lp_constraints_no)

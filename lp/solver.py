@@ -2,6 +2,8 @@ import os
 
 from ortools.linear_solver import pywraplp
 
+from lp.degree_one_constraints import add_degree_one_constraints
+from lp.degree_twos_constraints import add_degree_twos_constraints
 from lp.twin_nodes_constraints import set_twin_nodes_constraints
 from lp.utils import from_index
 from lp.variables_generator import create_variables
@@ -15,7 +17,7 @@ def __create_nodes_sequence(values, l_len):
     sequence = {i: 0 for i in range(l_len)}
     for variable, value in values.items():
         if value == 1:
-            i_index, j_index = from_index(l_len, variable)
+            i_index, j_index = from_index(variable)
             sequence[i_index] += 1
     return list(dict(sorted(sequence.items(), key=lambda x: x[1], reverse=True)).keys())
 
@@ -37,7 +39,8 @@ def solve(g, b_len, s_len, with_fractional_results, no_threads):
     add_triangle_constraints(solver, variables, l)
     twins_counter = set_twin_nodes_constraints(solver, variables, g, b, s, l)
     add_cumulative_constraints(solver, variables, b, s, l)
-    # add_degree_one_constraints(solver, variables, adj_list, b, s, l)
+    add_degree_one_constraints(solver, variables, g, b, l)
+    add_degree_twos_constraints(solver, variables, g, s)
 
     variables_no = solver.NumVariables()
     constraints_no = solver.NumConstraints()
@@ -53,7 +56,7 @@ def solve(g, b_len, s_len, with_fractional_results, no_threads):
         solver.Clear()
         sequence = None
         if not with_fractional_results:
-            sequence = __create_nodes_sequence(result, len(l))
+            sequence = __create_nodes_sequence(result, b_len + s_len)
         return {
             "k": k, "values": result, "number_of_covered_neighborhood": number_of_covered_neighborhood,
             "number_of_twins": twins_counter, "variables_no": variables_no, "constraints_no": constraints_no,

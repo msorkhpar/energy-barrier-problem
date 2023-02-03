@@ -28,4 +28,4 @@ def create_bgraph_of_intersections(g1_edges, g2_edges):
     g.add_nodes_from([node for node in s], bipartite=1)
     g.add_edges_from(edges)
 
-    return g
+    return g, b, s
