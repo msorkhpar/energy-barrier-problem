@@ -1,4 +1,4 @@
-from lp.utils import to_index
+from utility.utils import to_index
 
 
 def __add_twins(side, solver, variables, g, l):

@@ -2,7 +2,7 @@ import networkx as nx
 import pandas as pd
 
 
-def create_bgraph_of_intersections(g1_edges, g2_edges):
+def create_bigraph_of_intersections(g1_edges, g2_edges):
     g = nx.Graph()
 
     def get_index(graph_name, source, target):

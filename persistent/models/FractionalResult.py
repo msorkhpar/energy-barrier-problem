@@ -1,8 +1,8 @@
 import datetime
 import peewee as pw
 from playhouse.sqlite_ext import JSONField
-from persistent.BipartiteGraph import BipartiteGraph
-from persistent.BaseModel import BaseModel
+from persistent.models.BipartiteGraph import BipartiteGraph
+from persistent.models.BaseModel import BaseModel
 
 
 class FractionalResult(BaseModel):

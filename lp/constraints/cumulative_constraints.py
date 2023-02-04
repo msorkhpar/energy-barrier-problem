@@ -1,4 +1,4 @@
-from lp.utils import to_index, from_index
+from utility.utils import to_index, from_index
 
 
 def add_cumulative_constraints(solver, variables, b, s, l):

@@ -1,9 +1,7 @@
-import os
-import time
 import networkx as nx
-from graph_generator.bipartite_corrector import omit_degree_ones_from_bgraph
-from graph_generator.bipartite_transformer import transform_bgraph
-from lp.utils import set_l_len
+
+from graph_generator.bipartite_corrector import extract_nodes
+from graph_generator.bipartite_transformer import transform_bigraph
 
 
 def __create_bipartite_graph(edge_list):
@@ -23,8 +21,8 @@ def __create_bipartite_graph(edge_list):
 
 def run(edge_list, k: int, sequence):
     g, b, s = __create_bipartite_graph(edge_list)
-    # g, b, s = omit_degree_ones_from_bgraph(g)
-    g, b_len, s_len, edge_mapper = transform_bgraph(g)
+    g, b, s = extract_nodes(g)
+    g, b_len, s_len, edge_mapper = transform_bigraph(g)
     if len(sequence) != b_len + s_len:
         print("Invalid sequence!")
         print(f"Sequence length is not equal to the number of nodes in the graph!")

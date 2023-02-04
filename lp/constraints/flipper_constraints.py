@@ -1,4 +1,4 @@
-from lp.utils import to_index
+from utility.utils import to_index
 
 
 def add_flipper_constraints(solver, variables, l):
