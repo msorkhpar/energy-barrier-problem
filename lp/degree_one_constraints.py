@@ -2,19 +2,21 @@ from lp.utils import to_index, from_index
 
 
 def add_degree_one_constraints(solver, variables, g, b, l):
-    processed_b = set()
-    processed_s = set()
+    # degree on nodes
+    degree_one_candidates = set()
+    processed_nvb = set()
     for vb in b:
-        for vs in g[vb]:
-            if g.degree(vs) != 1:
+        has_degree_one_neighbor = False
+        for nvb in g[vb]:
+            if g.degree(nvb) != 1:
                 continue
-            if vb not in processed_b:
-                for index in l:
-                    if index not in processed_b and index not in processed_s and index != vb:
-                        solver.Add(variables[to_index(vb, index)] == 1)
-                processed_b.add(vb)
-
-            for index in l:
-                if index not in processed_b and index not in processed_s and index != vs:
-                    solver.Add(variables[to_index(vb, index)] == 1)
-            processed_s.add(vs)
+            has_degree_one_neighbor = True
+            for vl in l:
+                if vl == vb or vl == nvb or vl in processed_nvb or vl in degree_one_candidates:
+                    continue
+                solver.Add(variables[to_index(vb, vl)] == 1)
+                solver.Add(variables[to_index(nvb, vl)] == 1)
+            solver.Add(variables[to_index(vb, nvb)] == 1)
+            processed_nvb.add(nvb)
+        if has_degree_one_neighbor:
+            degree_one_candidates.add(vb)

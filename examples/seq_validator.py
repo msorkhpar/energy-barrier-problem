@@ -1,7 +1,7 @@
 import os
 import time
 import networkx as nx
-from graph_generator.bipartite_corrector import omit_degree_ones_from_bgraph
+from graph_generator.bipartite_corrector import extract_nodes
 from graph_generator.bipartite_transformer import transform_bgraph
 from lp.utils import set_l_len
 

@@ -2,7 +2,7 @@
 import os
 import time
 
-from graph_generator.bipartite_corrector import omit_degree_ones_from_bgraph
+from graph_generator.bipartite_corrector import extract_nodes
 from graph_generator.bipartite_generator import create_bgraph_of_intersections
 from graph_generator.bipartite_transformer import transform_bgraph
 from graph_generator.sample_graph_generator import generate_graph
@@ -47,18 +47,20 @@ def run(no_nodes, no_edges):
         print("Unknown graph generator type.")
         exit(1)
 
-    g, b, s = omit_degree_ones_from_bgraph(g)
-
+    g, b, s = extract_nodes(g)
     if "INTERSECTION" == os.environ.get("GRAPH_GENERATOR_TYPE"):
         b_db_id, s_db_id = db_service.persist_graphs(no_nodes, b, s)
 
     g, b_len, s_len, edge_mapper = transform_bgraph(g)
+
     bgraph_db_id = db_service.persist_bgraph(b_db_id, s_db_id, b_len, s_len, edge_mapper, g)
 
     if b is not None:
         del b
     if s is not None:
         del s
+    if edge_mapper is not None:
+        del edge_mapper
 
     integer_solution = __solve(g, b_len, s_len, False)
     db_service.persist_meta_data(
@@ -74,7 +76,6 @@ def run(no_nodes, no_edges):
         bgraph_db_id, integer_solution['k'], integer_solution['values'],
         False, integer_solution['running_time'], integer_solution['sequence']
     )
-    #__print_seq(integer_solution, edge_mapper)
     del integer_solution
     fractional_solution = __solve(g, b_len, s_len, True)
     db_service.persist_solution(
