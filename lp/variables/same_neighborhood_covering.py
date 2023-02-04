@@ -12,14 +12,25 @@ def __is_fully_covered(g, v1, v2):
     return True
 
 
-def add_neighborhood_variables(vars_dict, g, side):
+def add_neighborhood_variables(vars_dict, g, b, s):
     number_of_covered_neighborhood = 0
-    for v1 in side:
-        for v2 in side:
+    # neighborhood rules from B side
+    for v1 in b:
+        for v2 in b:
             if v1 == v2:
                 continue
             if __is_fully_covered(g, v1, v2):
                 number_of_covered_neighborhood += 1
                 vars_dict.update({to_index(v1, v2): (1, 1)})
                 vars_dict.update({to_index(v2, v1): (0, 0)})
+
+    # neighborhood rules from S side
+    for v1 in s:
+        for v2 in s:
+            if v1 == v2:
+                continue
+            if __is_fully_covered(g, v1, v2):
+                number_of_covered_neighborhood += 1
+                vars_dict.update({to_index(v1, v2): (0, 0)})
+                vars_dict.update({to_index(v2, v1): (1, 1)})
     return number_of_covered_neighborhood

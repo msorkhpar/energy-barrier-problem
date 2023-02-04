@@ -9,12 +9,10 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
 
     # adjacency matrix rules
     add_adjacency_matrix_variables(vars_dict, g, b, l)
-    # neighborhood rules from B side
-    number_of_covered_neighborhood += add_neighborhood_variables(vars_dict, g, b)
-    # neighborhood rules from S side
-    number_of_covered_neighborhood += add_neighborhood_variables(vars_dict, g, s)
+    # neighborhood rules
+    number_of_covered_neighborhood += add_neighborhood_variables(vars_dict, g, b,s)
     # degree one rules
-    #add_degree_ones_variables(vars_dict, g, b, l)
+    add_degree_ones_variables(vars_dict, g, b, l)
 
     variables = {}
     for index, r in vars_dict.items():

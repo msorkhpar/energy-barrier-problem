@@ -17,7 +17,7 @@ def __omit_degree_ones(g):
 
 
 def extract_nodes(g):
-    g = __omit_degree_ones(g)
+    #g = __omit_degree_ones(g)
     b = sorted([get_tuple(n) for n in g.nodes if g.nodes[n]['bipartite'] == 0])
     s = sorted([get_tuple(n) for n in g.nodes if g.nodes[n]['bipartite'] == 1])
     return g, b, s
