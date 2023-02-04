@@ -31,27 +31,6 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
                 # create the rest of variables with 0 <= X[i,j] <= 1 range
                 vars_dict.update({index: (0, 1)})
 
-    # degree on nodes
-    processed_b = set()
-    processed_s = set()
-    for vb in b:
-        for vs in g[vb]:
-            if g.degree(vs) != 1:
-                continue
-            if vb not in processed_b:
-                for index in l:
-                    if index not in processed_b and index not in processed_s and index != vb:
-                        vars_dict.update({to_index(vb, index): (1, 1)})
-                        vars_dict.update({to_index(index, vb): (0, 0)})
-
-                processed_b.add(vb)
-
-            for index in l:
-                if index not in processed_b and index not in processed_s and index != vs:
-                    vars_dict.update({to_index(vb, index): (1, 1)})
-                    vars_dict.update({to_index(index, vb): (0, 0)})
-            processed_s.add(vs)
-
     # neighborhood rules from B side
     for v1 in b:
         for v2 in b:
@@ -71,6 +50,29 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
                 number_of_covered_neighborhood += 1
                 vars_dict.update({to_index(v1, v2): (0, 0)})
                 vars_dict.update({to_index(v2, v1): (1, 1)})
+
+    # degree on nodes
+    processed_vb = set()
+    processed_nvb = set()
+    for vb in b:
+        has_degree_one_neighbor = False
+        for nvb in g[vb]:
+            if g.degree(nvb) != 1:
+                continue
+            has_degree_one_neighbor = True
+            for vl in l:
+                if vl == vb or vl == nvb or vl in processed_nvb or vl in processed_vb:
+                    continue
+                vars_dict.update({to_index(vb, vl): (1, 1)})
+                vars_dict.update({to_index(vl, vb): (0, 0)})
+                vars_dict.update({to_index(nvb, vl): (1, 1)})
+                vars_dict.update({to_index(vl, nvb): (0, 0)})
+            vars_dict.update({to_index(vb, nvb): (1, 1)})
+            vars_dict.update({to_index(nvb, vb): (0, 0)})
+            processed_nvb.add(nvb)
+        if has_degree_one_neighbor:
+            processed_vb.add(vb)
+    del processed_vb, processed_nvb
 
     for index, r in vars_dict.items():
         if with_fractional_results:

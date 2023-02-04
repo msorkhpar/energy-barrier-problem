@@ -34,12 +34,13 @@ def solve(g, b_len, s_len, with_fractional_results, no_threads):
         print("Could not create solver")
         return
 
-    variables, number_of_covered_neighborhood = create_variables(solver, g, b, s, l, with_fractional_results)
+    variables, number_of_covered_neighborhood = create_variables(
+        solver, g, b, s, l, with_fractional_results
+    )
     add_flipper_constraints(solver, variables, l)
     add_triangle_constraints(solver, variables, l)
     twins_counter = set_twin_nodes_constraints(solver, variables, g, b, s, l)
     add_cumulative_constraints(solver, variables, b, s, l)
-    add_degree_one_constraints(solver, variables, g, b, l)
     add_degree_twos_constraints(solver, variables, g, s)
 
     variables_no = solver.NumVariables()
@@ -64,6 +65,7 @@ def solve(g, b_len, s_len, with_fractional_results, no_threads):
         }
     else:
         print('The problem does not have an optimal solution.')
+        solver.Clear()
         return {
             "k": -1, "values": [], "number_of_covered_neighborhood": number_of_covered_neighborhood,
             "number_of_twins": twins_counter, "variables_no": variables_no, "constraints_no": constraints_no,
