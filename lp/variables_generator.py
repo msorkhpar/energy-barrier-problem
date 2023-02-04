@@ -31,27 +31,6 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
                 # create the rest of variables with 0 <= X[i,j] <= 1 range
                 vars_dict.update({index: (0, 1)})
 
-    # degree on nodes
-    processed_b = set()
-    processed_s = set()
-    for vb in b:
-        for vs in g[vb]:
-            if g.degree(vs) != 1:
-                continue
-            if vb not in processed_b:
-                for index in l:
-                    if index not in processed_b and index not in processed_s and index != vb:
-                        vars_dict.update({to_index(vb, index): (1, 1)})
-                        vars_dict.update({to_index(index, vb): (0, 0)})
-
-                processed_b.add(vb)
-
-            for index in l:
-                if index not in processed_b and index not in processed_s and index != vs:
-                    vars_dict.update({to_index(vb, index): (1, 1)})
-                    vars_dict.update({to_index(index, vb): (0, 0)})
-            processed_s.add(vs)
-
     # neighborhood rules from B side
     for v1 in b:
         for v2 in b:
