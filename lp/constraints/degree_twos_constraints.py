@@ -1,4 +1,4 @@
-from lp.utils import to_index, from_index
+from utility.utils import to_index
 
 
 def add_degree_twos_constraints(solver, variables, g, s):

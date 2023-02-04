@@ -3,8 +3,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from graph_generator.bipartite_corrector import extract_nodes
-from graph_generator.bipartite_transformer import transform_bgraph
-from lp import utils
+from graph_generator.bipartite_transformer import transform_bigraph
+from utility import utils
 from lp.solver import solve
 import numpy as np
 
@@ -56,8 +56,8 @@ def run(edge_list):
     nx.draw(g, pos=pos, node_size=2000, with_labels=True,
             node_color=["red"] * b_len + ["green"] * s_len)
     plt.show()
-    #g, b, s = omit_degree_ones_from_bgraph(g)
-    g, b_len, s_len, edge_mapper = transform_bgraph(g)
+    g, b, s = extract_nodes(g)
+    g, b_len, s_len, edge_mapper = transform_bigraph(g)
     utils.set_l_len(b_len + s_len)
 
     integer_solution = __solve(g, b_len, s_len, False)

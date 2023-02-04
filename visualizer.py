@@ -19,8 +19,8 @@ def create_bipartite_of_intersections_inner(edge_list: list[tuple[int, int]], b,
 
 
 if __name__ == '__main__':
-    bgraph_db_id = input("Enter bgraph DB id: ")
-    sample = retrieve_service.retrieve_sample(bgraph_db_id)
+    bigraph_db_id = input("Enter bgraph DB id: ")
+    sample = retrieve_service.retrieve_sample(bigraph_db_id)
     B, b_len, s_len = create_bipartite_of_intersections_inner(sample['edges'], sample['b'], sample['s'])
 
     print()

@@ -3,10 +3,10 @@ import os
 import time
 
 from graph_generator.bipartite_corrector import extract_nodes
-from graph_generator.bipartite_generator import create_bgraph_of_intersections
-from graph_generator.bipartite_transformer import transform_bgraph
+from graph_generator.intersection_generator import create_bigraph_of_intersections
+from graph_generator.bipartite_transformer import transform_bigraph
 from graph_generator.sample_graph_generator import generate_graph
-from random_graph_generator.random_graph_generator import generate_random_bigraph
+from graph_generator.random_bigraph_generator import generate_random_bigraph
 from lp.solver import solve
 from persistent import db_service
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ def run(no_nodes, no_edges):
     elif "INTERSECTION" == os.environ.get("GRAPH_GENERATOR_TYPE"):
         b = generate_graph(no_nodes, no_edges)
         s = generate_graph(no_nodes, no_edges)
-        g, b, s = create_bgraph_of_intersections(b, s)
+        g, b, s = create_bigraph_of_intersections(b, s)
     else:
         print("Unknown graph generator type.")
         exit(1)
@@ -51,9 +51,9 @@ def run(no_nodes, no_edges):
     if "INTERSECTION" == os.environ.get("GRAPH_GENERATOR_TYPE"):
         b_db_id, s_db_id = db_service.persist_graphs(no_nodes, b, s)
 
-    g, b_len, s_len, edge_mapper = transform_bgraph(g)
+    g, b_len, s_len, edge_mapper = transform_bigraph(g)
 
-    bgraph_db_id = db_service.persist_bgraph(b_db_id, s_db_id, b_len, s_len, edge_mapper, g)
+    bigraph_db_id = db_service.persist_bigraph(b_db_id, s_db_id, b_len, s_len, edge_mapper, g)
 
     if b is not None:
         del b
@@ -64,7 +64,7 @@ def run(no_nodes, no_edges):
 
     integer_solution = __solve(g, b_len, s_len, False)
     db_service.persist_meta_data(
-        bgraph_db_id, integer_solution["number_of_covered_neighborhood"], integer_solution["number_of_twins"],
+        bigraph_db_id, integer_solution["number_of_covered_neighborhood"], integer_solution["number_of_twins"],
         integer_solution["variables_no"], integer_solution["constraints_no"]
     )
     if integer_solution['k'] == -1:
@@ -73,13 +73,13 @@ def run(no_nodes, no_edges):
         print(f"G edges are [{g.edges(data=False)}]")
         return
     db_service.persist_solution(
-        bgraph_db_id, integer_solution['k'], integer_solution['values'],
+        bigraph_db_id, integer_solution['k'], integer_solution['values'],
         False, integer_solution['running_time'], integer_solution['sequence']
     )
     del integer_solution
     fractional_solution = __solve(g, b_len, s_len, True)
     db_service.persist_solution(
-        bgraph_db_id, fractional_solution['k'], fractional_solution['values'],
+        bigraph_db_id, fractional_solution['k'], fractional_solution['values'],
         True, fractional_solution['running_time']
     )
     del fractional_solution
@@ -91,6 +91,12 @@ if __name__ == '__main__':
     no_samples = int(os.environ.get("NUMBER_OF_SAMPLES"))
     min_no_edges = int(os.environ.get("MIN_NUMBER_OF_EDGES"))
     max_no_edges = int(os.environ.get("MAX_NUMBER_OF_EDGES"))
+
+    if "RANDOM_BIGRAPH" != os.environ.get("GRAPH_GENERATOR_TYPE") and \
+            "INTERSECTION" != os.environ.get("GRAPH_GENERATOR_TYPE"):
+        print("Unknown graph generator type.")
+        exit(1)
+
     for no_edges in range(min_no_edges, max_no_edges + 1):
         for i in range(no_samples):
             print("*" * 120)

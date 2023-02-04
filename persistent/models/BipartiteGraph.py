@@ -1,12 +1,12 @@
 import datetime
 import peewee as pw
 from playhouse.sqlite_ext import JSONField
-from persistent.BaseModel import BaseModel
-from persistent.SampleGraph import SampleGraph
+from persistent.models.BaseModel import BaseModel
+from persistent.models.SampleGraph import SampleGraph
 
 
 class BipartiteGraph(BaseModel):
-    bgraph_id = pw.AutoField()
+    bigraph_id = pw.AutoField()
     integer_k = pw.IntegerField(null=True)
     fractional_k = pw.DoubleField(null=True)
     b = pw.IntegerField()

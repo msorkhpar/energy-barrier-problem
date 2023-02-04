@@ -1,7 +1,7 @@
 import datetime
 import peewee as pw
 from playhouse.sqlite_ext import JSONField
-from persistent.BaseModel import BaseModel
+from persistent.models.BaseModel import BaseModel
 
 
 class SampleGraph(BaseModel):
