@@ -8,6 +8,7 @@ COPY main.py main.py
 COPY graph_generator graph_generator
 COPY lp lp
 COPY persistent persistent
+COPY utility utility
 ENV TZ America/Indiana/Indianapolis
 
 RUN pip3 install -r requirements.txt
