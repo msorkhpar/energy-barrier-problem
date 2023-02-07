@@ -1,20 +1,11 @@
 import random
 import networkx as nx
+from utility.utils import create_random_bipartite_graph
 
 
-def generate_random_bigraph(max_allowed_nodes: int, max_allowed_edges: int, min_allowed_edges: int = None):
-    if min_allowed_edges is None:
-        min_allowed_edges = min(max_allowed_edges, max_allowed_nodes)
-    if min_allowed_edges > max_allowed_edges:
-        min_allowed_edges, max_allowed_edges = max_allowed_edges, min_allowed_edges
-
-    b = list(range(max_allowed_nodes))
-    s = list(range(max_allowed_nodes, max_allowed_nodes * 2))
-    no_edges = random.randint(min_allowed_edges, max_allowed_edges)
-    edges = [(random.choice(b), random.choice(s)) for _ in range(no_edges)]
-    g = nx.Graph()
+def generate_random_bigraph(b_size: int, s_size: int, min_no_edges: int, max_no_edges):
+    g, b, s = create_random_bipartite_graph(b_size, s_size, random.randint(min_no_edges, max_no_edges))
     g.add_nodes_from([node for node in b], bipartite=0)
     g.add_nodes_from([node for node in s], bipartite=1)
-    g.add_edges_from(edges)
 
     return g, b, s

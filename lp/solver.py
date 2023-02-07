@@ -15,18 +15,17 @@ def __create_nodes_sequence(values, l_len):
     return list(dict(sorted(sequence.items(), key=lambda x: x[1], reverse=True)).keys())
 
 
-def __create_solver(no_threads):
+def __create_solver():
     solver = pywraplp.Solver.CreateSolver('SCIP')
-    solver.SetNumThreads(no_threads)
     return solver
 
 
-def solve(g, b_len, s_len, with_fractional_results, no_threads):
+def solve(g, b_len, s_len, with_fractional_results):
     b = list(range(b_len))
     s = list(range(b_len, b_len + s_len))
     l = b + s
 
-    solver = __create_solver(no_threads)
+    solver = __create_solver()
 
     if not solver:
         print("Could not create solver")

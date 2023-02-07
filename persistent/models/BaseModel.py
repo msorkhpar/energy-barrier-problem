@@ -7,7 +7,14 @@ load_dotenv()
 
 db = None
 if db is None:
-    db = pw.SqliteDatabase(f"./db/{os.environ.get('DB_NAME')}")
+    if os.environ.get('GRAPH_GENERATOR_TYPE') == "RANDOM_BIGRAPH":
+        db_name = os.environ.get('RANDOM_DB_NAME')
+    elif os.environ.get('GRAPH_GENERATOR_TYPE') == "INTERSECTION":
+        db_name = os.environ.get('INTERSECTION_DB_NAME')
+    else:
+        db_name = "Default.db"
+
+    db = pw.SqliteDatabase(f"./db/{db_name}")
 
 
 class BaseModel(pw.Model):
