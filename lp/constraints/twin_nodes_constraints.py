@@ -1,4 +1,4 @@
-from utility.utils import to_index
+from utility.utils import to_index, print_value_sign
 
 
 def __add_twins(side, solver, variables, g, l):
@@ -9,12 +9,16 @@ def __add_twins(side, solver, variables, g, l):
             if va == vb or vb in processed:
                 continue
             if g[vb] == g[va]:
+                if va < vb:
+                    solver.Add(variables[to_index(va, vb)] == 1)
+
                 for vc in l:
                     if g[vc] == g[va] or vc == va or vc == vb:
                         continue
                     x_ac = to_index(va, vc)
                     x_bc = to_index(vb, vc)
                     solver.Add(variables[x_ac] == variables[x_bc])
+                    print_value_sign(va, vc, vb, vc, "==")
                 twins_counter += 1
         processed.add(va)
     return twins_counter

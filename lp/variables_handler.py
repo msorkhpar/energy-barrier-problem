@@ -1,21 +1,18 @@
 from lp.variables.adjacency_matrix import add_adjacency_matrix_variables
-from lp.variables.degree_ones import add_degree_ones_variables
 from lp.variables.same_neighborhood_covering import add_neighborhood_variables
 
 
 def create_variables(solver, g, b, s, l, with_fractional_results):
     number_of_covered_neighborhood = 0
-    vars_dict = {}
+    variables_dictionary = {}
 
     # adjacency matrix rules
-    add_adjacency_matrix_variables(vars_dict, g, b, l)
+    add_adjacency_matrix_variables(variables_dictionary, g, b, l)
     # neighborhood rules
-    number_of_covered_neighborhood += add_neighborhood_variables(vars_dict, g, b,s)
-    # degree one rules
-    add_degree_ones_variables(vars_dict, g, b, l)
+    number_of_covered_neighborhood += add_neighborhood_variables(variables_dictionary, g, b, s)
 
     variables = {}
-    for index, r in vars_dict.items():
+    for index, r in variables_dictionary.items():
         if with_fractional_results:
             variables[index] = solver.NumVar(r[0], r[1], '%i' % index)
         else:
@@ -23,8 +20,8 @@ def create_variables(solver, g, b, s, l, with_fractional_results):
 
     # Add k as a variable to the end of list
     if with_fractional_results:
-        variables[len(vars_dict)] = solver.NumVar(1, len(b), '%i' % (len(vars_dict)))
+        variables[len(variables_dictionary)] = solver.NumVar(1, len(b), '%i' % (len(variables_dictionary)))
     else:
-        variables[len(vars_dict)] = solver.IntVar(1, len(b), '%i' % (len(vars_dict)))
+        variables[len(variables_dictionary)] = solver.IntVar(1, len(b), '%i' % (len(variables_dictionary)))
 
     return variables, solver.NumVariables(), number_of_covered_neighborhood

@@ -7,6 +7,7 @@ from persistent.models.SampleGraph import SampleGraph
 
 class BipartiteGraph(BaseModel):
     bigraph_id = pw.AutoField()
+    meta_info = pw.TextField(null=True)
     integer_k = pw.IntegerField(null=True)
     fractional_k = pw.DoubleField(null=True)
     b = pw.IntegerField()

@@ -10,17 +10,13 @@ services:
     environment:
       - TZ=America/Indiana/Indianapolis
       - PYTHONUNBUFFERED=1
-      - NUMBER_OF_THREADS=${NUMBER_OF_THREADS}
       - GRAPH_GENERATOR_TYPE=${GRAPH_GENERATOR_TYPE}
-      - BIGRAPH_MAX_EDGES=${BIGRAPH_MAX_EDGES}
-      - BIGRAPH_MIN_EDGES=${BIGRAPH_MIN_EDGES}
-      - NUMBER_OF_VERTICES=${NUMBER_OF_VERTICES}
-      - NUMBER_OF_SAMPLES=${NUMBER_OF_SAMPLES}
-      - MIN_NUMBER_OF_EDGES=${MIN_NUMBER_OF_EDGES}
-      - MAX_NUMBER_OF_EDGES=${MAX_NUMBER_OF_EDGES}
-      - DB_NAME=${DB_NAME}
+      - RANDOM_DB_NAME=${RANDOM_DB_NAME}
+      - INTERSECTION_DB_NAME=${INTERSECTION_DB_NAME}
     volumes:
       - ./db:/app/db
+      - ./plan-random.csv:/app/plan-random.csv
+      - ./plan-intersection.csv:/app/plan-intersection.csv
     deploy:
       resources:
         limits:
