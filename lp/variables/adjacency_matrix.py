@@ -19,5 +19,3 @@ def add_adjacency_matrix_variables(variables_dictionary, g, b, l):
                 # create the rest of variables with 0 <= X[i,j] <= 1 range
                 variables_dictionary.update({index: (0, 1)})
                 print_value(i, j, 0, 1)
-
-

@@ -31,7 +31,7 @@ if __name__ == '__main__':
     print(f"edges:{sample['edges']}")
     print(f"sequence: {sample['sequence']}")
 
-    fig, ax = plt.subplots(figsize=(b_len, b_len * (b_len / s_len)))
+    fig, ax = plt.subplots(figsize=(b_len, b_len * (b_len / s_len) * 1.5))
 
     pos = nx.bipartite_layout(B, sample['b'])
     nx.draw(B, pos=pos, node_size=2000, with_labels=True,
