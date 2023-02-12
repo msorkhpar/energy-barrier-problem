@@ -4,13 +4,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: energy-barrier-solver:1.0
+    image: energy-barrier-solver:1.1
     container_name: energy-barrier-solver
     command: python3 main.py
     environment:
       - TZ=America/Indiana/Indianapolis
       - PYTHONUNBUFFERED=1
       - GRAPH_GENERATOR_TYPE=${GRAPH_GENERATOR_TYPE}
+      - WITH_PRICE=${WITH_PRICE}
+      - NUMBER_OF_PROCESSES=${NUMBER_OF_PROCESSES}
       - RANDOM_DB_NAME=${RANDOM_DB_NAME}
       - INTERSECTION_DB_NAME=${INTERSECTION_DB_NAME}
     volumes:

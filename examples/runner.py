@@ -22,15 +22,15 @@ def print_values(values, l_len):
     print(f"Numbers: {value_numbers}")
 
 
-def __solve(g, b_len, s_len, fractional):
+def __solve(g, b_len, s_len, mapped_prices, fractional):
     start = time.time()
-    result = solve(g, b_len, s_len, fractional)
+    result = solve(g, b_len, s_len, mapped_prices, fractional)
     running_time = time.time() - start
     result["running_time"] = running_time
     return result
 
 
-def run(edge_list, draw_graph=False, values_in_console=False):
+def run(edge_list, prices, draw_graph=False, values_in_console=False):
     g, b, s = utils.create_bipartite_graph(edge_list)
     b_len = len(b)
     s_len = len(s)
@@ -44,9 +44,9 @@ def run(edge_list, draw_graph=False, values_in_console=False):
     g, b, s = extract_nodes(g, b)
     utils.set_l_len(b_len + s_len)
     g, b, s, b_len, s_len, edge_mapper = transform_bigraph(g)
-
-    integer_solution = __solve(g, b_len, s_len, False)
-    fractional_solution = __solve(g, b_len, s_len, True)
+    mapped_prices = {edge_mapper[k]: v for k, v in prices.items()}
+    integer_solution = __solve(g, b_len, s_len, mapped_prices, False)
+    fractional_solution = __solve(g, b_len, s_len, mapped_prices, True)
     if values_in_console:
         print_values(fractional_solution['values'], b_len + s_len)
     print(f"number_of_twins:{integer_solution['number_of_twins']}")
@@ -67,5 +67,7 @@ if __name__ == '__main__':
     # B to S edge list
     with open(f'{example_number}.txt') as f:
         edge_list = [tuple(map(str.strip, i.split(','))) for i in f]
-    #utils.enable_print_values()
-    run(edge_list, True)
+    with open(f'{example_number}-prices.txt') as f:
+        prices = {int(i.split('=')[0].strip()): int(i.split('=')[1].strip()) for i in f}
+    print(prices)
+    run(edge_list, prices, True)

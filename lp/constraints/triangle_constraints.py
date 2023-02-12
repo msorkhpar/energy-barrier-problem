@@ -1,16 +1,13 @@
-from utility.utils import to_index
+from lp.parameters import Parameters
 
 
-def add_triangle_constraints(solver, variables, l):
-    for i in l:
-        for j in l:
+def add_triangle_constraints(parameters: Parameters):
+    for i in parameters.l:
+        for j in parameters.l:
             if i == j:
                 continue
 
-            for k in l:
+            for k in parameters.l:
                 if k == i or k == j:
                     continue
-
-                solver.Add(variables[to_index(i, j)] +
-                           variables[to_index(j, k)] +
-                           variables[to_index(k, i)] >= 1)
+                parameters.add_constraint(parameters.var(i, j) + parameters.var(j, k) + parameters.var(k, i) >= 1)

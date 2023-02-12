@@ -14,7 +14,7 @@ if db is None:
     else:
         db_name = "Default.db"
 
-    db = pw.SqliteDatabase(f"./db/{db_name}")
+    db = pw.SqliteDatabase(f"./db/{db_name}", check_same_thread=False)
 
 
 class BaseModel(pw.Model):

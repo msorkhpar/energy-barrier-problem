@@ -1,3 +1,5 @@
+from networkx import Graph
+from lp.solution import Solution
 from persistent.models.BaseModel import BaseModel
 
 from persistent.models.SampleGraph import SampleGraph
@@ -17,8 +19,7 @@ def __persist_graph(number_of_nodes, edges):
         return g.graph_id
 
 
-def __persist_bigraph(b_db_id, s_db_id, meta_info,
-                      b_len, s_len, number_of_edges, edges, node_mapping):
+def __persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, number_of_edges, edges, node_mapping, prices):
     with BaseModel.get_db() as db:
         g = BipartiteGraph(
             b_graph=b_db_id,
@@ -28,7 +29,8 @@ def __persist_bigraph(b_db_id, s_db_id, meta_info,
             s=s_len,
             number_of_edges=number_of_edges,
             edges=edges,
-            node_mapping=node_mapping
+            node_mapping=node_mapping,
+            prices=prices
         )
         g.save()
         return g.bigraph_id
@@ -93,7 +95,8 @@ def persist_graphs(no_nodes, b, s):
     return b_db_id, s_db_id
 
 
-def persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, edge_mapper, g):
+def persist_bigraph(b_db_id: int, s_db_id: int, meta_info: str, b_len: int, s_len: int,
+                    prices: dict, edge_mapper: dict, g: Graph):
     edges = dict()
     for from_node, to_node in g.edges:
         # from -> to
@@ -108,22 +111,21 @@ def persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, edge_mapper, g):
     edges_list = [mapper.edge_mapper(from_node, to_nodes) for from_node, to_nodes in sorted(edges.items())]
     node_mapping = [mapper.edge_mapper(from_node, to_node) for from_node, to_node in edge_mapper.items()]
 
-    return __persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, len(g.edges), edges_list, node_mapping)
+    return __persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, len(g.edges), edges_list, node_mapping, prices)
 
 
-def persist_solution(bigraph_db_id, solution, fractional):
-    vals = [mapper.result_mapper(from_node, to_node) for from_node, to_node in solution["values"].items()]
+def persist_solution(bigraph_db_id: int, solution: Solution, l_len: int, fractional: bool):
+    vals = [mapper.result_mapper(l_len, from_node, to_node) for from_node, to_node in solution.values.items()]
     if fractional:
-        __update_fractional_solution(bigraph_db_id, solution["k"], solution["solution_time"])
-        return __persist_fractional_result(bigraph_db_id, solution["k"], vals)
+        __update_fractional_solution(bigraph_db_id, solution.k, solution.solution_time)
+        return __persist_fractional_result(bigraph_db_id, solution.k, vals)
     else:
-        __update_integer_solution(bigraph_db_id, solution["k"], solution["solution_time"])
-        return __persist_integer_result(bigraph_db_id, solution["k"], vals, solution["sequence"])
+        __update_integer_solution(bigraph_db_id, solution.k, solution.solution_time)
+        return __persist_integer_result(bigraph_db_id, solution.k, vals, solution.sequence)
 
 
-
-def persist_meta_data(b_db_id, integer_solution):
+def persist_meta_data(b_db_id: int, solution: Solution):
     __update_lp_values(
-        b_db_id, integer_solution["number_of_covered_neighborhood"], integer_solution["number_of_twins"],
-        integer_solution["variables_no"], integer_solution["constraints_no"]
+        b_db_id, solution.number_of_covered_neighborhood, solution.number_of_twins,
+        solution.variables_no, solution.constraints_no
     )

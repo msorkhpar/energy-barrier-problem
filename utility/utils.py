@@ -2,24 +2,12 @@ from datetime import datetime
 import networkx as nx
 from networkx.algorithms import bipartite
 
-l_len = 0
-print_values = False
 
-
-def set_l_len(__l_len):
-    global l_len
-    l_len = __l_len
-
-
-def enable_print_values():
-    global print_values
-    print_values = True
-
-def to_index(i, j):
+def to_index(l_len, i, j):
     return i * l_len + j
 
 
-def from_index(index):
+def from_index(l_len, index):
     index = int(index)
     if index == l_len ** 2:
         return "K", ""
@@ -28,21 +16,6 @@ def from_index(index):
 
 def get_now():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-
-def print_value(i, j, lb, ub):
-    global print_values
-    if print_values:
-        if lb == ub:
-            print(f"X({i}_{j}) = {lb}")
-        else:
-            print(f"{lb} <= X({i}_{j}) <= {ub}")
-
-
-def print_value_sign(v1, v2, v3, v4, sign):
-    global print_values
-    if print_values:
-        print(f"X({v1}_{v2}) {sign} X({v3}_{v4})")
 
 
 def create_bipartite_graph(edge_list: list[tuple[int, int]]):
