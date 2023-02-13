@@ -7,7 +7,8 @@ services:
     image: energy-barrier-solver:1.1
     container_name: energy-barrier-solver-random
     depends_on:
-      - db
+      random-db:
+        condition: service_healthy
     command: python3 main.py
     environment:
       TZ: America/Indiana/Indianapolis
@@ -28,8 +29,12 @@ services:
           cpus: "10"
           memory: 50GB
         reservations:
-          cpus: "2"
+          cpus: "1"
           memory: 2GB
+    networks:
+      - random
+    profiles:
+      - random
   intersection-app:
     build:
       context: .
@@ -37,7 +42,8 @@ services:
     image: energy-barrier-solver:1.1
     container_name: energy-barrier-solver-intersection
     depends_on:
-      - db
+      intersection-db:
+          condition: service_healthy
     command: python3 main.py
     environment:
       TZ: America/Indiana/Indianapolis
@@ -60,16 +66,50 @@ services:
         reservations:
           cpus: "2"
           memory: 2GB
+    networks:
+      - intersection
+    profiles:
+      - intersection
 
-  db:
+  random-db:
     image: postgres
     restart: unless-stopped
-    ports:
-      - "5432:${DB_PORT}"
+    container_name: random-pg-db
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: "exit 0"
     volumes:
-      - ./db-data:/var/lib/postgresql/data
+      - ./random-db-data:/var/lib/postgresql/data
+    networks:
+      - random
+    profiles:
+      - random
+
+  intersection-db:
+    image: postgres
+    restart: unless-stopped
+    container_name: intersection-pg-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: "exit 0"
+    volumes:
+      - ./intersection-db-data:/var/lib/postgresql/data
+    networks:
+      - intersection
+    profiles:
+      - intersection
+
+
+networks:
+  random:
+    driver: bridge
+  intersection:
+    driver: bridge

@@ -13,6 +13,13 @@ if db is None:
     db_name = os.environ.get('DB_NAME')
     db_user = os.environ.get('DB_USER')
     db_password = os.environ.get('DB_PASSWORD')
+    mode = os.environ.get('GRAPH_GENERATOR_TYPE')
+    if db_host == "docker":
+        if mode == "RANDOM_BIGRAPH":
+            db_host = "random-db"
+        elif mode == "INTERSECTION":
+            db_host = "intersection-db"
+
     db = PostgresqlExtDatabase(db_name, host=db_host, port=db_port, user=db_user, password=db_password)
 
 

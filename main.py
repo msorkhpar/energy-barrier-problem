@@ -111,6 +111,9 @@ def __generate_random_price_dict(b_len, s_len):
 
 def __run(g, meta_info, with_prices, b_db_id=None, s_db_id=None):
     g, b, s, b_len, s_len, edge_mapper = transform_bigraph(g)
+    if b_len == 0 or s_len == 0:
+        print(f"Bigraph has no edges. Skipping...")
+        return
     price_dict = None if not with_prices else __generate_random_price_dict(b_len, s_len)
     bigraph_db_id = db_service.persist_bigraph(b_db_id, s_db_id, meta_info, b_len, s_len, price_dict, edge_mapper, g)
 
@@ -173,7 +176,7 @@ if __name__ == '__main__':
             for i in range(no_samples):
                 tasks_to_accomplish.put(
                     IntersectionData(i, no_samples, row['no_nodes'], row['no_edges'],
-                                     f"I_{'P_' if with_prices else ''}{index}{index}", with_prices)
+                                     f"I_{'P_' if with_prices else ''}{index}", with_prices)
                 )
     else:
         print("Unknown graph generator type.")
