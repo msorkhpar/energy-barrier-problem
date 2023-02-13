@@ -2,19 +2,16 @@ import os
 
 import peewee as pw
 from dotenv import load_dotenv
+from playhouse.postgres_ext import PostgresqlExtDatabase
 
 load_dotenv()
 
 db = None
 if db is None:
-    if os.environ.get('GRAPH_GENERATOR_TYPE') == "RANDOM_BIGRAPH":
-        db_name = os.environ.get('RANDOM_DB_NAME')
-    elif os.environ.get('GRAPH_GENERATOR_TYPE') == "INTERSECTION":
-        db_name = os.environ.get('INTERSECTION_DB_NAME')
-    else:
-        db_name = "Default.db"
-
-    db = pw.SqliteDatabase(f"./db/{db_name}")
+    db_name = os.environ.get('DB_NAME')
+    db_user = os.environ.get('DB_USER')
+    db_password = os.environ.get('DB_PASSWORD')
+    db = PostgresqlExtDatabase(db_name, host='localhost', port=5432, user=db_user, password=db_password)
 
 
 class BaseModel(pw.Model):

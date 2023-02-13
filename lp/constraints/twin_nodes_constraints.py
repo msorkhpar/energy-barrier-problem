@@ -1,31 +1,28 @@
-from utility.utils import to_index, print_value_sign
+from lp.parameters import Parameters
 
 
-def __add_twins(side, solver, variables, g, l):
+def __add_twins(side, parameters: Parameters):
     processed = set()
     twins_counter = 0
     for va in side:
         for vb in side:
             if va == vb or vb in processed:
                 continue
-            if g[vb] == g[va]:
+            if parameters.g[vb] == parameters.g[va]:
                 if va < vb:
-                    solver.Add(variables[to_index(va, vb)] == 1)
+                    parameters.add_constraint(parameters.var(va, vb) == 1)
 
-                for vc in l:
-                    if g[vc] == g[va] or vc == va or vc == vb:
+                for vc in parameters.l:
+                    if parameters.g[vc] == parameters.g[va] or vc == va or vc == vb:
                         continue
-                    x_ac = to_index(va, vc)
-                    x_bc = to_index(vb, vc)
-                    solver.Add(variables[x_ac] == variables[x_bc])
-                    print_value_sign(va, vc, vb, vc, "==")
+                    parameters.add_constraint(parameters.var(va, vc) == parameters.var(vb, vc))
                 twins_counter += 1
         processed.add(va)
     return twins_counter
 
 
-def set_twin_nodes_constraints(solver, variables, g, b, s, l):
+def set_twin_nodes_constraints(solver: Parameters):
     twins_counter = 0
-    twins_counter += __add_twins(b, solver, variables, g, l)
-    twins_counter += __add_twins(s, solver, variables, g, l)
+    twins_counter += __add_twins(solver.b, solver)
+    twins_counter += __add_twins(solver.s, solver)
     return twins_counter

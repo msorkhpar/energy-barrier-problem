@@ -1,23 +1,28 @@
-from utility.utils import to_index, from_index
+import sys
+
+from lp.parameters import Parameters
 
 
-def add_cumulative_constraints(solver, variables, b, s, l):
-    l_len = len(l)
-    for m in l:
+def add_cumulative_constraints(parameters: Parameters):
+    upper_bound = parameters.l_len if parameters.prices is None else sys.maxsize
+    for m in parameters.l:
+        row = [0] * (parameters.l_len ** 2 + 1)
+        # coefficient of the k should be set to 1
+        row[parameters.l_len ** 2] = 1
+        constraint = parameters.solver.Constraint(0, upper_bound)
 
-        row = [0] * (l_len ** 2 + 1)
-        row[l_len ** 2] = 1
-        constraint = solver.Constraint(0, l_len)
-
-        for i in b:
+        for i in parameters.b:
             if i != m:
-                row[to_index(i, m)] = -1
+                value = -1 if parameters.prices is None else -1 * parameters.prices[i]
+                row[parameters.to_index(i, m)] = value
 
-        for j in s:
+        for j in parameters.s:
             if j != m:
-                row[to_index(j, m)] = 1
-        for tmp_i in range(l_len ** 2 + 1):
-            i_index, j_index = from_index(tmp_i)
+                value = 1 if parameters.prices is None else parameters.prices[j]
+                row[parameters.to_index(j, m)] = value
+
+        for tmp_i in range(parameters.l_len ** 2 + 1):
+            i_index, j_index = parameters.from_index(tmp_i)
             if i_index == j_index:
                 row[tmp_i] = 0
-            constraint.SetCoefficient(variables[tmp_i], row[tmp_i])
+            constraint.SetCoefficient(parameters.variables[tmp_i], row[tmp_i])

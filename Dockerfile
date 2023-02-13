@@ -1,7 +1,6 @@
 FROM python:3.10-slim-bullseye
 RUN pip install --upgrade pip
 WORKDIR /app
-RUN mkdir "db"
 
 COPY requirements.txt requirements.txt
 COPY main.py main.py

@@ -23,6 +23,7 @@ class BipartiteGraph(BaseModel):
     lp_variables_no = pw.IntegerField(null=True)
     lp_constraints_no = pw.IntegerField(null=True)
     node_mapping = JSONField()
+    prices = JSONField(null=True)
     creation_date = pw.DateTimeField(default=datetime.datetime.now)
 
     class Meta:

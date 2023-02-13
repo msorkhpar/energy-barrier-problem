@@ -4,4 +4,5 @@ pandas
 matplotlib
 ortools
 peewee
+psycopg2-binary
 python-dotenv

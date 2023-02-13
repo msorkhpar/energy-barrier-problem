@@ -1,9 +1,9 @@
-from utility.utils import to_index
+from lp.parameters import Parameters
 
 
-def add_flipper_constraints(solver, variables, l):
-    for i in l:
-        for j in l:
+def add_flipper_constraints(parameters: Parameters):
+    for i in parameters.l:
+        for j in parameters.l:
             if i == j:
                 continue
-            solver.Add(variables[to_index(i, j)] + variables[to_index(j, i)] == 1)
+            parameters.add_constraint(parameters.var(i, j) + parameters.var(j, i) == 1)

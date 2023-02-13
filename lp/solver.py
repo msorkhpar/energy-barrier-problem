@@ -1,62 +1,64 @@
+from __future__ import annotations
+
 from ortools.linear_solver import pywraplp
 
 from lp.constraints_handler import create_constraints
-from utility.utils import from_index
+from lp.parameters import Parameters
+from lp.solution import Solution
 from lp.variables_handler import create_variables
 import numpy as np
 
 
-def __create_nodes_sequence(values, l_len):
-    sequence = {i: 0 for i in range(l_len)}
-    for variable, value in values.items():
-        if value == 1:
-            i_index, j_index = from_index(variable)
-            sequence[i_index] += 1
-    return list(dict(sorted(sequence.items(), key=lambda x: x[1], reverse=True)).keys())
+class Solver:
+    def __init__(self, parameters: Parameters):
+        self.parameters = parameters
 
+    def to_index(self, i, j):
+        return self.parameters.to_index(i, j)
 
-def __create_solver():
-    solver = pywraplp.Solver.CreateSolver('SCIP')
-    return solver
+    def from_index(self, index):
+        return self.parameters.from_index(index)
 
+    def __create_nodes_sequence(self, values):
+        sequence = {i: 0 for i in range(self.parameters.l_len)}
+        for variable, value in values.items():
+            if value == 1:
+                i_index, j_index = self.from_index(variable)
+                sequence[i_index] += 1
+        return list(dict(sorted(sequence.items(), key=lambda x: x[1], reverse=True)).keys())
 
-def solve(g, b_len, s_len, with_fractional_results):
-    b = list(range(b_len))
-    s = list(range(b_len, b_len + s_len))
-    l = b + s
+    def solve(self) -> Solution | None:
+        if not self.parameters.solver:
+            print("Could not create solver")
+            return None
 
-    solver = __create_solver()
+        solver = self.parameters.solver
+        # Preparation
+        covered_neighborhood = create_variables(self.parameters)
 
-    if not solver:
-        print("Could not create solver")
-        return
+        twins_counter = create_constraints(self.parameters)
+        constraints_no = self.parameters.solver.NumConstraints()
+        variables_no = self.parameters.solver.NumVariables()
+        # Objective function
+        solver.Minimize(self.parameters.variables[variables_no - 1])
+        status = self.parameters.solver.Solve()
 
-    # Preparation
-    variables, variables_no, covered_neighborhood = create_variables(solver, g, b, s, l, with_fractional_results)
-    constraints_no, twins_counter = create_constraints(solver, variables, g, b, s, l)
-
-    # Objective function
-    solver.Minimize(variables[solver.NumVariables() - 1])
-    status = solver.Solve()
-
-    solution = {
-        "k": -1, "values": [], "number_of_covered_neighborhood": covered_neighborhood,
-        "number_of_twins": twins_counter, "variables_no": variables_no, "constraints_no": constraints_no,
-        "sequence": None
-    }
-    values = {}
-    if status == pywraplp.Solver.OPTIMAL:
-        k = variables[solver.NumVariables() - 1].solution_value()
-        k = np.round(k, 4)
-        for var_index in range(solver.NumVariables() - 1):
-            values[var_index] = variables[var_index].solution_value()
-        solver.Clear()
-        sequence = None
-        if not with_fractional_results:
-            sequence = __create_nodes_sequence(values, b_len + s_len)
-        solution.update({"k": k, "values": values, "sequence": sequence})
-        return solution
-    else:
-        print('The given problem does not have an optimal solution.')
-        solver.Clear()
-        return solution
+        solution = Solution(covered_neighborhood, twins_counter, variables_no, constraints_no)
+        values = {}
+        if status == pywraplp.Solver.OPTIMAL:
+            k = self.parameters.variables[solver.NumVariables() - 1].solution_value()
+            k = np.round(k, 4)
+            for var_index in range(variables_no - 1):
+                values[var_index] = self.parameters.variables[var_index].solution_value()
+            solver.Clear()
+            sequence = None
+            if not self.parameters.with_fractional_results:
+                sequence = self.__create_nodes_sequence(values)
+            solution.set_k(k)
+            solution.set_values(values)
+            solution.set_sequence(sequence)
+            return solution
+        else:
+            print('The given problem does not have an optimal solution.')
+            solver.Clear()
+            return solution
