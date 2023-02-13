@@ -7,7 +7,7 @@ import time
 from multiprocessing import Process, Queue
 
 from lp.solver import Parameters, Solver
-from persistent import db_service
+import persistent.db_service as db_service
 from dotenv import load_dotenv
 import pandas as pd
 
@@ -72,7 +72,9 @@ def run_random(random_data: RandomData):
         random_data.b_size, random_data.s_size, random_data.min_no_edges, random_data.max_no_edges
     )
     g, b, s = extract_nodes(g, b)
-    return __run(g, random_data.meta_info, random_data.with_prices)
+    bigraph_db_id = __run(g, random_data.meta_info, random_data.with_prices)
+    print(f"Bigraph[ {bigraph_db_id} ] has been finished")
+    return bigraph_db_id
 
 
 class IntersectionData:
@@ -120,20 +122,18 @@ def __run(g, meta_info, with_prices, b_db_id=None, s_db_id=None):
         del edge_mapper
 
     print(f"Final values before solving: |b|=[{b_len}], |s|=[{s_len}], |g|=[{len(g.edges())}]")
+    __solve(bigraph_db_id, g, b_len, s_len, price_dict, True)
+    # run integer solver in a separate process
     integer_process = Process(target=__solve, args=(bigraph_db_id, g, b_len, s_len, price_dict, False))
-    fractional_process = Process(target=__solve, args=(bigraph_db_id, g, b_len, s_len, price_dict, True))
-    # start processes
     integer_process.start()
-    fractional_process.start()
-    # wait for processes to finish
     integer_process.join()
-    fractional_process.join()
-    print(f"Bigraph[ {bigraph_db_id} ] has been finished")
+
     del g
+    return bigraph_db_id
 
 
 # https://www.digitalocean.com/community/tutorials/python-multiprocessing-example
-def do_job(tasks_to_accomplish):
+def do_job(tasks_to_accomplish: Queue):
     while True:
         try:
             task = tasks_to_accomplish.get_nowait()
@@ -142,11 +142,13 @@ def do_job(tasks_to_accomplish):
             elif isinstance(task, IntersectionData):
                 run_intersection(task)
         except queue.Empty:
+            time.sleep(10)
             break
 
 
 if __name__ == '__main__':
     load_dotenv()
+    db_service.create_tables()
     number_of_processes = int(os.environ.get("NUMBER_OF_PROCESSES"))
     tasks_to_accomplish = Queue()
     processes = []
@@ -159,8 +161,8 @@ if __name__ == '__main__':
             no_samples = row['samples']
             for i in range(no_samples):
                 tasks_to_accomplish.put(
-                    RandomData(i, no_samples, row['b_size'], row['s_size'],
-                               row['min_edges'], row['max_edges'], f"R_{index}", with_prices)
+                    RandomData(i, no_samples, row['b_size'], row['s_size'], row['min_edges'], row['max_edges'],
+                               f"R_{'P_' if with_prices else ''}{index}", with_prices)
                 )
 
     elif "INTERSECTION" == generator_type:
@@ -170,7 +172,8 @@ if __name__ == '__main__':
 
             for i in range(no_samples):
                 tasks_to_accomplish.put(
-                    IntersectionData(i, no_samples, row['no_nodes'], row['no_edges'], f"I_{index}", with_prices)
+                    IntersectionData(i, no_samples, row['no_nodes'], row['no_edges'],
+                                     f"I_{'P_' if with_prices else ''}{index}{index}", with_prices)
                 )
     else:
         print("Unknown graph generator type.")

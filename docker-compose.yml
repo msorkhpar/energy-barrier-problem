@@ -1,29 +1,71 @@
 version: '3'
 services:
-  app:
+  random-app:
     build:
       context: .
       dockerfile: Dockerfile
     image: energy-barrier-solver:1.1
-    container_name: energy-barrier-solver
+    container_name: energy-barrier-solver-random
+    depends_on:
+      - db
     command: python3 main.py
     environment:
-      - TZ=America/Indiana/Indianapolis
-      - PYTHONUNBUFFERED=1
-      - GRAPH_GENERATOR_TYPE=${GRAPH_GENERATOR_TYPE}
-      - WITH_PRICE=${WITH_PRICE}
-      - NUMBER_OF_PROCESSES=${NUMBER_OF_PROCESSES}
-      - RANDOM_DB_NAME=${RANDOM_DB_NAME}
-      - INTERSECTION_DB_NAME=${INTERSECTION_DB_NAME}
+        TZ: America/Indiana/Indianapolis
+        PYTHONUNBUFFERED: 1
+        GRAPH_GENERATOR_TYPE: RANDOM_BIGRAPH
+        WITH_PRICES: ${WITH_PRICES}
+        NUMBER_OF_PROCESSES: ${NUMBER_OF_PROCESSES}
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./db:/app/db
       - ./plan-random.csv:/app/plan-random.csv
+    deploy:
+      resources:
+        limits:
+          cpus: "10"
+          memory: 50GB
+        reservations:
+          cpus: "2"
+          memory: 2GB
+  intersection-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: energy-barrier-solver:1.1
+    container_name: energy-barrier-solver-intersection
+    depends_on:
+      - db
+    command: python3 main.py
+    environment:
+      TZ: America/Indiana/Indianapolis
+      PYTHONUNBUFFERED: 1
+      GRAPH_GENERATOR_TYPE: INTERSECTION
+      WITH_PRICES: ${WITH_PRICES}
+      NUMBER_OF_PROCESSES: ${NUMBER_OF_PROCESSES}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
       - ./plan-intersection.csv:/app/plan-intersection.csv
     deploy:
       resources:
         limits:
-          cpus: "5"
-          memory: 20GB
+          cpus: "10"
+          memory: 50GB
         reservations:
           cpus: "2"
           memory: 2GB
+
+  db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./db-data:/var/lib/postgresql/data

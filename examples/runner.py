@@ -1,3 +1,4 @@
+import os
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -5,7 +6,9 @@ import matplotlib.pyplot as plt
 from graph_generator.bipartite_corrector import extract_nodes
 from graph_generator.bipartite_transformer import transform_bigraph
 from utility import utils
-from lp.solver import solve
+from lp.solver import Solver
+from lp.solver import Parameters
+from lp.solver import Solution
 import numpy as np
 
 
@@ -17,16 +20,17 @@ def print_values(values, l_len):
             print()
         val = np.round(val, 3)
         value_numbers.add(val)
-        print(f"X{utils.from_index(index)}: {val}", end=", ")
+        print(f"X{utils.from_index(l_len, index)}: {val}", end=", ")
     print()
     print(f"Numbers: {value_numbers}")
 
 
-def __solve(g, b_len, s_len, mapped_prices, fractional):
+def __solve(g, b_len, s_len, mapped_prices, fractional) -> Solution:
     start = time.time()
-    result = solve(g, b_len, s_len, mapped_prices, fractional)
+    parameters = Parameters(g, b_len, s_len, fractional, mapped_prices)
+    result = Solver(parameters).solve()
     running_time = time.time() - start
-    result["running_time"] = running_time
+    result.set_solution_time(running_time)
     return result
 
 
@@ -42,24 +46,23 @@ def run(edge_list, prices, draw_graph=False, values_in_console=False):
         plt.show()
 
     g, b, s = extract_nodes(g, b)
-    utils.set_l_len(b_len + s_len)
     g, b, s, b_len, s_len, edge_mapper = transform_bigraph(g)
-    mapped_prices = {edge_mapper[k]: v for k, v in prices.items()}
+    mapped_prices = None if prices is None else {edge_mapper[k]: v for k, v in prices.items()}
     integer_solution = __solve(g, b_len, s_len, mapped_prices, False)
     fractional_solution = __solve(g, b_len, s_len, mapped_prices, True)
     if values_in_console:
-        print_values(fractional_solution['values'], b_len + s_len)
-    print(f"number_of_twins:{integer_solution['number_of_twins']}")
-    print(f"number_of_covered_neighborhood:{integer_solution['number_of_covered_neighborhood']}")
+        print_values(fractional_solution.values, b_len + s_len)
+    print(f"number_of_twins:{integer_solution.number_of_twins}")
+    print(f"number_of_covered_neighborhood:{integer_solution.number_of_covered_neighborhood}")
     print(f"sequence: [", end="")
     edge_mapper = {v: k for k, v in edge_mapper.items()}
-    for seq in integer_solution['sequence']:
+    for seq in integer_solution.sequence:
         print(f"{edge_mapper[seq]}, ", end="")
     print("]")
-    print(f"integral_result: [{integer_solution['k']}]")
-    print(f"fractional_result: [{fractional_solution['k']}]")
-    print(f"running_time:{integer_solution['running_time']}")
-    print(f"running_time:{fractional_solution['running_time']}")
+    print(f"integral_result: [{integer_solution.k}]")
+    print(f"fractional_result: [{fractional_solution.k}]")
+    print(f"running_time:{integer_solution.solution_time}")
+    print(f"running_time:{fractional_solution.solution_time}")
 
 
 if __name__ == '__main__':
@@ -67,7 +70,9 @@ if __name__ == '__main__':
     # B to S edge list
     with open(f'{example_number}.txt') as f:
         edge_list = [tuple(map(str.strip, i.split(','))) for i in f]
-    with open(f'{example_number}-prices.txt') as f:
-        prices = {int(i.split('=')[0].strip()): int(i.split('=')[1].strip()) for i in f}
-    print(prices)
+
+    prices = None
+    if os.path.exists(f'{example_number}-prices.txt'):
+        with open(f'{example_number}-prices.txt') as f:
+            prices = {int(i.split('=')[0].strip()): int(i.split('=')[1].strip()) for i in f}
     run(edge_list, prices, True)
