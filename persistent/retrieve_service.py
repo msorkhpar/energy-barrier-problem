@@ -56,10 +56,12 @@ def retrieve_bigraph(bigraph_db_id):
     for mapping in bigraph.node_mapping:
         node_mapping.append((mapping['to'], mapping['from']))
 
+    prices = {int(key): value for key, value in bigraph.prices.items()}
+
     integer_result = __get_integer_result(bigraph_db_id)
     return {
         "edges": edges, "node_mapping": node_mapping,
-        "b": b, "s": s,
+        "b": b, "s": s, "prices": prices,
         "fractional_k": bigraph.fractional_k, "integer_k": bigraph.integer_k,
         "sequence": integer_result.sequence
     }

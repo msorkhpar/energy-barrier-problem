@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import os
 
-from lp.solver import solve
+from lp.solver import Solver
+from lp.solver import Parameters
+from lp.solver import Solution
 from persistent import retrieve_service
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -30,6 +32,7 @@ if __name__ == '__main__':
     print()
     print(f"edges:{sample['edges']}")
     print(f"sequence: {sample['sequence']}")
+    print(f"prices: {sample['prices']}")
 
     fig, ax = plt.subplots(figsize=(b_len, b_len * (b_len / s_len) * 1.5))
 
@@ -41,12 +44,14 @@ if __name__ == '__main__':
     print(f"b: {b_len}, s: {s_len}")
 
     g, b, s = utils.create_bipartite_graph(sample['edges'])
-    utils.set_l_len(b_len + s_len)
-    integer_result = solve(g, b_len, s_len, False)
-    fractional_result = solve(g, b_len, s_len, True)
+    prices = sample['prices']
+    parameters = Parameters(g, b_len, s_len, False, prices)
+    integer_result = Solver(parameters).solve()
+    parameters.with_fractional_results = True
+    fractional_result = Solver(parameters).solve()
     print("*" * 40)
     print(f"integer result: [{sample['integer_k']}]")
-    print(f"integer check result: [{integer_result['k']}]")
+    print(f"integer check result: [{integer_result.k}]")
     print("*" * 40)
     print(f"fractional result: [{sample['fractional_k']}]")
-    print(f"fractional check result: [{fractional_result['k']}]")
+    print(f"fractional check result: [{fractional_result.k}]")
