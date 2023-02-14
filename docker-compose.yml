@@ -43,7 +43,7 @@ services:
     container_name: energy-barrier-solver-intersection
     depends_on:
       intersection-db:
-          condition: service_healthy
+        condition: service_healthy
     command: python3 main.py
     environment:
       TZ: America/Indiana/Indianapolis
@@ -83,7 +83,7 @@ services:
     healthcheck:
       test: "exit 0"
     volumes:
-      - ./random-db-data:/var/lib/postgresql/data
+      - random-db-data:/var/lib/postgresql/data
     networks:
       - random
     profiles:
@@ -101,12 +101,15 @@ services:
     healthcheck:
       test: "exit 0"
     volumes:
-      - ./intersection-db-data:/var/lib/postgresql/data
+      - intersection-db-data:/var/lib/postgresql/data
     networks:
       - intersection
     profiles:
       - intersection
 
+volumes:
+  random-db-data:
+  intersection-db-data:
 
 networks:
   random:
