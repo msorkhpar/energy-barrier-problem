@@ -1,5 +1,6 @@
 import networkx as nx
 
+
 def transform_bigraph(g):
     left_nodes = [n for n in g.nodes if g.nodes[n]['bipartite'] == 0]
     right_nodes = [n for n in g.nodes if g.nodes[n]['bipartite'] == 1]
