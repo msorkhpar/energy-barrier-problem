@@ -19,7 +19,7 @@ from graph_generator.random_bigraph_generator import generate_random_bigraph
 
 
 def __print_seq(integer_solution, edge_mapper):
-    print(f"sequence: [", end="")
+    print("sequence: [", end="")
     edge_mapper = {v: k for k, v in edge_mapper.items()}
     for seq in integer_solution['sequence']:
         print(f"{edge_mapper[seq]}, ", end="")
@@ -40,7 +40,7 @@ def __solve(bigraph_db_id, g, b_len, s_len, price_dict, fractional):
     db_service.persist_meta_data(bigraph_db_id, result)
 
     if result.k == -1:
-        print(f"Solver could not find a solution for the given graph.")
+        print("Solver could not find a solution for the given graph.")
         print(f"G nodes are [{g.nodes()}]")
         print(f"G edges are [{g.edges(data=False)}]")
         del result
