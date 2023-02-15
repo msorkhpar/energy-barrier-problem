@@ -26,7 +26,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "10"
+          cpus: "2"
           memory: 50GB
         reservations:
           cpus: "1"
@@ -61,10 +61,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "10"
+          cpus: "2"
           memory: 50GB
         reservations:
-          cpus: "2"
+          cpus: "1"
           memory: 2GB
     networks:
       - intersection
@@ -84,6 +84,8 @@ services:
       test: "exit 0"
     volumes:
       - random-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - random
     profiles:
